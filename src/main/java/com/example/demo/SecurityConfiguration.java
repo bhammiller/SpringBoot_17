@@ -14,15 +14,19 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .authorizeRequests()
+                .antMatchers("/")
+                .access("hasAuthority('USER') or hasAuthority('ADMIN')")
+                .antMatchers("/admin").access("hasAuthority('ADMIN')")
                 .anyRequest().authenticated()
                 .and()
-                .formLogin()
+                .formLogin().loginPage("/login").permitAll()
                 .and()
                 .httpBasic();
     }
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception{
-        auth.inMemoryAuthentication().withUser("User").password("password").roles("USER");
+        auth.inMemoryAuthentication().withUser("User").password("password").authorities("USER").and()
+                .withUser("dave").password("begreat").authorities("ADMIN");
     }
 }
